@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  auth,
-  firebaseConfigured,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from '@/lib/firebase'
+import { auth, firebaseConfigured } from '@/lib/firebase'
 import { Button } from '@/components/button'
 import { Cloud, LogOut, UserRound } from 'lucide-react'
 
@@ -21,7 +14,7 @@ export default function SyncAccount() {
 
   useEffect(() => {
     if (!auth) return
-    return onAuthStateChanged(auth, setUser)
+    return auth.onAuthStateChanged(setUser)
   }, [])
 
   if (!firebaseConfigured) {
@@ -37,10 +30,10 @@ export default function SyncAccount() {
     setBusy(true)
     try {
       if (mode === 'signin') {
-        await signInWithEmailAndPassword(auth, email.trim(), password)
+        await auth.signInWithEmailAndPassword(email.trim(), password)
         toast.success('Signed in — picks will sync across devices')
       } else {
-        await createUserWithEmailAndPassword(auth, email.trim(), password)
+        await auth.createUserWithEmailAndPassword(email.trim(), password)
         toast.success('Account created — your current picks will sync')
       }
       setOpen(false)
@@ -48,6 +41,7 @@ export default function SyncAccount() {
     } catch (err) {
       const messages = {
         'auth/invalid-credential': 'Email or password is incorrect.',
+        'auth/invalid-login-credentials': 'Email or password is incorrect.',
         'auth/email-already-in-use': 'That email already has an account.',
         'auth/weak-password': 'Use a password with at least 6 characters.',
         'auth/invalid-email': 'Enter a valid email address.',
@@ -64,7 +58,7 @@ export default function SyncAccount() {
         <span className="text-xs text-muted-foreground hidden sm:inline" title={user.email}>
           <Cloud className="w-3.5 h-3.5 inline mr-1" /> Synced
         </span>
-        <Button size="sm" variant="ghost" onClick={() => signOut(auth)} title="Sign out">
+        <Button size="sm" variant="ghost" onClick={() => auth.signOut()} title="Sign out">
           <LogOut className="w-4 h-4" />
         </Button>
       </div>
@@ -85,33 +79,10 @@ export default function SyncAccount() {
           <p className="text-xs text-muted-foreground">
             Use the same account on every device. Your picks stay tied to your account.
           </p>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-            autoComplete="email"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-            minLength={6}
-            autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
-          <Button className="w-full" disabled={busy}>
-            {busy ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}
-          </Button>
-          <button
-            type="button"
-            className="w-full text-xs text-muted-foreground hover:underline"
-            onClick={() => setMode((m) => (m === 'signin' ? 'signup' : 'signin'))}
-          >
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required autoComplete="email" className="w-full rounded-md border bg-background px-3 py-2 text-sm" />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required minLength={6} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} className="w-full rounded-md border bg-background px-3 py-2 text-sm" />
+          <Button className="w-full" disabled={busy}>{busy ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}</Button>
+          <button type="button" className="w-full text-xs text-muted-foreground hover:underline" onClick={() => setMode((m) => (m === 'signin' ? 'signup' : 'signin'))}>
             {mode === 'signin' ? 'Need an account? Create one' : 'Already have an account? Sign in'}
           </button>
         </form>
