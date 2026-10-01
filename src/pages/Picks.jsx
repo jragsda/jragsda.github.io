@@ -27,8 +27,10 @@ export default function Picks() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPlayerId, season, week, games])
 
-  const maxConf = games.length
-  const minConf = 1
+  // Confidence values always run from 16 downward. During bye weeks,
+  // the unused lowest values are simply skipped (e.g. 16 → 3 for 14 games).
+  const maxConf = 16
+  const minConf = Math.max(1, maxConf - games.length + 1)
 
   const onDragEnd = (result) => {
     if (!result.destination) return
