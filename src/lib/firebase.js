@@ -1,42 +1,20 @@
-import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'
-import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js'
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-} from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js'
-
-const config = window.__FIREBASE_CONFIG__
+const config = window.__FIREBASE_CONFIG__ || {}
 
 export const firebaseConfigured =
-  !!config &&
-  typeof config.apiKey === 'string' &&
-  config.apiKey &&
-  typeof config.projectId === 'string' &&
-  config.projectId
+  !!window.firebase &&
+  !!config.apiKey &&
+  config.apiKey !== 'REPLACE_ME' &&
+  !!config.projectId &&
+  config.projectId !== 'REPLACE_ME'
 
-const app = firebaseConfigured
-  ? (getApps().length ? getApps()[0] : initializeApp(config))
-  : null
+let app = null
+let auth = null
+let firestore = null
 
-export const auth = app ? getAuth(app) : null
-export const firestore = app ? getFirestore(app) : null
-
-export {
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
+if (firebaseConfigured) {
+  app = window.firebase.initializeApp(config)
+  auth = window.firebase.auth(app)
+  firestore = window.firebase.firestore(app)
 }
+
+export { auth, firestore }
