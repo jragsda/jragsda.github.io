@@ -2,6 +2,7 @@ import React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAppState } from '@/lib/AppState'
 import { Button } from '@/components/button'
+import SyncAccount from '@/components/SyncAccount'
 import { RefreshCw, BarChart3, ListOrdered, ClipboardCheck, Pencil } from 'lucide-react'
 
 export default function Layout() {
@@ -31,35 +32,23 @@ export default function Layout() {
             className="rounded-md border border-border bg-card px-2 py-1 text-sm"
           >
             {Array.from({ length: 18 }, (_, i) => i + 1).map((w) => (
-              <option key={w} value={w}>
-                Week {w}
-              </option>
+              <option key={w} value={w}>Week {w}</option>
             ))}
           </select>
           <Button variant="ghost" size="sm" onClick={() => refresh()} disabled={loading}>
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Pull
           </Button>
           <nav className="flex gap-1 ml-auto">
-            <NavLink to="/" end className={navClass}>
-              <BarChart3 className="w-4 h-4" /> Dashboard
-            </NavLink>
-            <NavLink to="/picks" className={navClass}>
-              <ListOrdered className="w-4 h-4" /> Picks
-            </NavLink>
-            <NavLink to="/results" className={navClass}>
-              <ClipboardCheck className="w-4 h-4" /> Results
-            </NavLink>
+            <NavLink to="/" end className={navClass}><BarChart3 className="w-4 h-4" /> Dashboard</NavLink>
+            <NavLink to="/picks" className={navClass}><ListOrdered className="w-4 h-4" /> Picks</NavLink>
+            <NavLink to="/results" className={navClass}><ClipboardCheck className="w-4 h-4" /> Results</NavLink>
           </nav>
+          <SyncAccount />
         </div>
         <div className="max-w-5xl mx-auto px-4 pb-3 flex items-center gap-2 flex-wrap">
           <span className="text-xs text-muted-foreground mr-1">Picks for:</span>
           {players.map((p) => (
-            <Button
-              key={p.id}
-              size="sm"
-              variant={p.id === currentPlayerId ? 'default' : 'outline'}
-              onClick={() => setCurrentPlayerId(p.id)}
-            >
+            <Button key={p.id} size="sm" variant={p.id === currentPlayerId ? 'default' : 'outline'} onClick={() => setCurrentPlayerId(p.id)}>
               {p.name}
             </Button>
           ))}
@@ -68,9 +57,7 @@ export default function Layout() {
           </Button>
         </div>
       </header>
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        <Outlet />
-      </main>
+      <main className="max-w-5xl mx-auto px-4 py-6"><Outlet /></main>
     </div>
   )
 }
