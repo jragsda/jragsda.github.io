@@ -7,6 +7,9 @@ export const firebaseConfigured =
   !!config.projectId &&
   config.projectId !== 'REPLACE_ME'
 
+// Everyone who signs in reads/writes this ONE shared document.
+export const POOL_ID = 'fish-lore'
+
 let app = null
 let auth = null
 let firestore = null
